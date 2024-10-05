@@ -11,8 +11,8 @@ root.title("課題管理")
 root.geometry("920x600")
 root.config(bg="gray14")
 
-jikanwari = file.load()
-file.sort_jikanwari(jikanwari)
+jikanwari = file.Load()
+file.Sort_Jikanwari(jikanwari)
 
 label_Count = 0
 weekdays = {
@@ -38,9 +38,9 @@ def On_Key_Event(event):
 
 def Open_Confirmation_Window(kamoku):
     """詳細ウィンドウの表示"""
-    confirmation_window = tk.Toplevel(root)
-    confirmation_window.title(kamoku)
-    confirmation_window.geometry("300x318")
+    confirmation_Window = tk.Toplevel(root)
+    confirmation_Window.title(kamoku)
+    confirmation_Window.geometry("300x318")
     
     teisyutujoukyou = "未提出" if jikanwari[kamoku]["提出"] == 0 else "提出済"
     
@@ -53,27 +53,26 @@ def Open_Confirmation_Window(kamoku):
     """
     comment = comment.format(kamoku, jikanwari[kamoku]["曜日"], teisyutujoukyou, jikanwari[kamoku]["期限"], jikanwari[kamoku]["提出忘れ"])
 
-    subject_Label = tk.Label(confirmation_window, text=comment, font=("Arial", 13, "bold"), foreground="gray92", background="gray28")
+    subject_Label = tk.Label(confirmation_Window, text=comment, font=("Arial", 13, "bold"), foreground="gray92", background="gray28")
     subject_Label.grid(row=0, column=0, columnspan=3, sticky="ew")
     
     def Close_Window():
-        confirmation_window.destroy()  # ウィンドウを閉じる
+        confirmation_Window.destroy()  # ウィンドウを閉じる
 
-    update_button = tk.Button(confirmation_window, text="閉じる", fg="gray92", bg="gray28", command=Close_Window)
-    update_button.grid(row=1, column=0, columnspan=3, sticky="ew")
+    update_Button = tk.Button(confirmation_Window, text="閉じる", fg="gray92", bg="gray28", command=Close_Window)
+    update_Button.grid(row=1, column=0, columnspan=3, sticky="ew")
     
-    confirmation_window.grid_columnconfigure(0, weight=1)
-    confirmation_window.grid_columnconfigure(1, weight=1)
-    confirmation_window.grid_columnconfigure(2, weight=1)
+    confirmation_Window.grid_columnconfigure(0, weight=1)
+    confirmation_Window.grid_columnconfigure(1, weight=1)
+    confirmation_Window.grid_columnconfigure(2, weight=1)
 
 def Raice(kamoku):
     """提出処理"""
-    global jikanwari
     # チェックされた項目の処理
-    checked_items = Check_All_Checkbox_Values()
-    for idx in checked_items:
-        subject_name = list(jikanwari.keys())[idx]
-        Process_Subject_Submission(subject_name)
+    checked_Items = Check_All_Checkbox_Values()
+    for idx in checked_Items:
+        subject_Name = list(jikanwari.keys())[idx]
+        Process_Subject_Submission(subject_Name)
 
     # 現在の課題の提出状況を処理
     Process_Subject_Submission(kamoku)
@@ -81,15 +80,15 @@ def Raice(kamoku):
 def Process_Subject_Submission(kamoku):
     """指定した科目を提出に書き換える"""
     kadaihaihubi = file.Kadai_Haihu_Day(weekdays[jikanwari[kamoku]["曜日"]])
-    simekiribi = file.shimekiri_Day(kadaihaihubi, jikanwari[kamoku]["期限"])
+    simekiribi = file.Deadline_Day(kadaihaihubi, jikanwari[kamoku]["期限"])
 
     if datetime.strptime(simekiribi, '%Y-%m-%d').date() < datetime.now().date():
         kadaihaihubi = file.Next_Kadai_Haihu_Day(weekdays[jikanwari[kamoku]["曜日"]])
 
     if datetime.strptime(kadaihaihubi, '%Y-%m-%d').date() <= datetime.now().date():
         jikanwari[kamoku]["提出"] = 1
-        file.save(jikanwari)
-        file.sort_jikanwari(jikanwari)
+        file.Save(jikanwari)
+        file.Sort_Jikanwari(jikanwari)
 
         Update_Submission_Button(kamoku)
         Update_Main_Window()
@@ -108,7 +107,7 @@ def Cancel(kamoku):
     global jikanwari
     check = Check_All_Checkbox_Values()
     jikanwari[kamoku]["提出"] = 0 
-    jikanwari = file.save(jikanwari)
+    jikanwari = file.Save(jikanwari)
     raise_Button = tk.Button(main_Frame, text="取消", font=("Arial", 10, "bold"), command=partial(Raice, kamoku), width=7)
     raise_Button.grid(row=label_Count + 1, column=7, padx=10) 
 
@@ -120,7 +119,7 @@ def Cancel(kamoku):
                 jikanwari[target]["提出"] = 0 
             else:
                 continue
-            jikanwari = file.save(jikanwari)
+            jikanwari = file.Save(jikanwari)
 
             for widget in main_Frame.grid_slaves():
                 if isinstance(widget, tk.Button) and widget.cget("text") == "提出取り消し":
@@ -154,7 +153,7 @@ def Add_Subject():
     values = ["月","火","水","木","金","土","日"]
     add_Weekday_ComboBox = ttk.Combobox(add_Weekday_Frame, values=values, width=4, font=(13), background="gray28")
     add_Weekday_ComboBox.grid(row=1, column=1, padx=20)
-    add_Weekday_ComboBox.current(0)
+    add_Weekday_ComboBox.current(datetime.today().day)
     
     add_Deadline_Label= tk.Label(add_Weekday_Frame, text="         期限 :",  font=("Arial", 14), fg="gray96", bg="gray28")
     add_Deadline_Label.grid(row=1, column=2, padx=10)
@@ -183,18 +182,37 @@ def Add_Subject():
         kigen = add_Deadline_Entry.get()
         wasure = add_forgetcount_Entry.get()
         
+        if kamoku == "" or youbi == "" or kigen == "" or wasure == "":
+            messagebox.showerror("エラー", "未入力の項目があります。")
+            return
+        
+        if youbi not in weekdays.keys():
+            messagebox.showerror("エラー", "曜日は日から月の間で入力してください")
+            return
+        
         result = messagebox.askquestion(
             "確認", 
             "科目：{}\n曜日：{}\n期限：配布から{}日後\n提出忘れ：{}回\n上記の内容でよろしいですか？".format(kamoku, youbi, kigen, wasure)
-            )
+        )
         
         if result == "yes":
-            jikanwari = file.saves(kamoku, youbi, int(kigen), int(wasure))
-            jikanwari = file.update_Raise(jikanwari)
-            jikanwari = file.sort_jikanwari(jikanwari)
-            Update_Main_Window()
-            Close_Window()
-    
+            try:
+                if kamoku in jikanwari.keys(): 
+                    result = messagebox.askquestion("警告", "既に、科目【{}】は存在します。上書きしますか？".format(kamoku))
+                    if result != "yes":
+                        return
+
+                jikanwari = file.Saves(kamoku, youbi, int(kigen), int(wasure))
+                jikanwari = file.Update_Raise(jikanwari)
+                jikanwari = file.Sort_Jikanwari(jikanwari)
+                
+                Update_Main_Window()
+                Close_Window()
+
+            except Exception as e:
+                messagebox.showerror("エラー", f"登録に失敗しました。\n内容を確認後もう一度お試しください。\nエラー: {str(e)}")
+
+                        
     add_Button_Frame = tk.Frame(add_Subject_Window, bg="gray28")
     add_Button_Frame.grid(row=3, column=0, columnspan=7, padx=50, pady=20)
     quit_Button = tk.Button(add_Button_Frame, text="閉じる", font=(7), fg="gray92", bg="gray28", width=4, command=Close_Window)
@@ -208,14 +226,14 @@ def Add_Subject():
 def Delete_Subject():
     """科目の削除を行う"""
     global jikanwari
-    checked_items = Check_All_Checkbox_Values()
-    result = messagebox.askquestion("確認", "選択した{}科目を削除します。\nよろしいですか？".format(len(checked_items)))
+    checked_Items = Check_All_Checkbox_Values()
+    result = messagebox.askquestion("確認", "選択した{}科目を削除します。\nよろしいですか？".format(len(checked_Items)))
     if result == "yes":
-        for idx in checked_items:
-            subject_name = list(jikanwari.keys())[idx]
-            del jikanwari[subject_name]
+        for idx in checked_Items:
+            subject_Name = list(jikanwari.keys())[idx]
+            del jikanwari[subject_Name]
             
-        file.save(jikanwari)
+        file.Save(jikanwari)
         Update_Main_Window()
 
         
@@ -234,11 +252,11 @@ def Update_Main_Window():
 
     for kamoku in jikanwari:
         kadaihaihubi = file.Kadai_Haihu_Day(weekdays[jikanwari[kamoku]["曜日"]])
-        simekiribi = file.shimekiri_Day(kadaihaihubi, jikanwari[kamoku]["期限"])
+        simekiribi = file.Deadline_Day(kadaihaihubi, jikanwari[kamoku]["期限"])
 
         if datetime.strptime(simekiribi, '%Y-%m-%d').date() < datetime.now().date():
             kadaihaihubi = file.Next_Kadai_Haihu_Day(weekdays[jikanwari[kamoku]["曜日"]])
-            simekiribi = file.shimekiri_Day(kadaihaihubi, jikanwari[kamoku]["期限"])
+            simekiribi = file.Deadline_Day(kadaihaihubi, jikanwari[kamoku]["期限"])
             frame_Color = "gray28"
             
         elif datetime.strptime(simekiribi, '%Y-%m-%d').date() - datetime.now().date() <= timedelta(days=1):
