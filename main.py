@@ -120,10 +120,6 @@ def Cancel(kamoku):
             else:
                 continue
             jikanwari = file.Save(jikanwari)
-
-            for widget in main_Frame.grid_slaves():
-                if isinstance(widget, tk.Button) and widget.cget("text") == "提出取り消し":
-                    widget.destroy()
             
             raise_Button = tk.Button(main_Frame, text="取消", font=("Arial", 10, "bold"), command=partial(Raice, kamoku), width=7)
             raise_Button.grid(row=label_Count + 1, column=7, padx=10) 
@@ -331,6 +327,7 @@ def Update_Main_Window():
         raise_Button.grid(row=0, column=7, padx=10)
 
         label_Count += 1
+        
 
         
 def Scroll_Canvas(event):
