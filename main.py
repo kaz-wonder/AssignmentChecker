@@ -237,7 +237,6 @@ def Delete_Subject():
         
         file.Save(jikanwari)
         jikanwari = file.Load()    
-        print(jikanwari)
         
         Update_Main_Window()
 
@@ -265,7 +264,6 @@ def Update_Main_Window():
     max_subject_width = max(len(kamoku) for kamoku in jikanwari) + 4 
     
     for kamoku in jikanwari:
-        print(kamoku)
         kadaihaihubi = file.Kadai_Haihu_Day(weekdays[jikanwari[kamoku]["曜日"]])
         simekiribi = file.Deadline_Day(kadaihaihubi, jikanwari[kamoku]["期限"])
 
@@ -344,12 +342,11 @@ def Scroll_Canvas(event):
     
 def Check_All_Checkbox_Values():
     """チェックボックスの取得"""
-    check_list = []
+    check_List = []
     for idx, var in enumerate(checkbox_Vars):
         if var.get() == 1:
-            check_list.append(idx)
-    print(check_list)
-    return check_list
+            check_List.append(idx)
+    return check_List
 
 """メインウィンドウの表示"""
 canvas = tk.Canvas(root, bg="gray20")
