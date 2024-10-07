@@ -166,8 +166,8 @@ def Add_Subject():
     add_Forgetcount_Frame.grid(row=2, column=0, columnspan=7, padx=50, pady=20)
     add_Forgetcount_Label = tk.Label(add_Forgetcount_Frame, text="提出忘れ :",  font=("Arial", 14), fg="gray96", bg="gray28")
     add_Forgetcount_Label.grid(row=0, column=0, padx=10)
-    add_forgetcount_Entry = tk.Entry(add_Forgetcount_Frame, font=("Arial", 13), fg="gray92", bg="gray28", width=4)
-    add_forgetcount_Entry.grid(row=0, column=1, padx=3)
+    add_Forgetcount_Entry = tk.Entry(add_Forgetcount_Frame, font=("Arial", 13), fg="gray92", bg="gray28", width=4)
+    add_Forgetcount_Entry.grid(row=0, column=1, padx=3)
     add_Forgetcount_Label2 = tk.Label(add_Forgetcount_Frame, text="回",  font=("Arial", 14), fg="gray96", bg="gray28")
     add_Forgetcount_Label2.grid(row=0, column=2, padx=10)
     
@@ -180,7 +180,7 @@ def Add_Subject():
         kamoku = add_Subject_Entry.get()
         youbi = add_Weekday_ComboBox.get()
         kigen = add_Deadline_Entry.get()
-        wasure = add_forgetcount_Entry.get()
+        wasure = add_Forgetcount_Entry.get()
         
         if kamoku == "" or youbi == "" or kigen == "" or wasure == "":
             messagebox.showerror("エラー", "未入力の項目があります。")
