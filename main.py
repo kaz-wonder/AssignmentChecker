@@ -153,7 +153,6 @@ def Add_Subject():
     values = ["月","火","水","木","金","土","日"]
     add_Weekday_ComboBox = ttk.Combobox(add_Weekday_Frame, values=values, width=4, font=(13), background="gray28")
     add_Weekday_ComboBox.grid(row=1, column=1, padx=20)
-    add_Weekday_ComboBox.current(datetime.today().day)
     
     add_Deadline_Label= tk.Label(add_Weekday_Frame, text="         期限 :",  font=("Arial", 14), fg="gray96", bg="gray28")
     add_Deadline_Label.grid(row=1, column=2, padx=10)
@@ -229,11 +228,17 @@ def Delete_Subject():
     checked_Items = Check_All_Checkbox_Values()
     result = messagebox.askquestion("確認", "選択した{}科目を削除します。\nよろしいですか？".format(len(checked_Items)))
     if result == "yes":
+        delete_List = []
         for idx in checked_Items:
-            subject_Name = list(jikanwari.keys())[idx]
-            del jikanwari[subject_Name]
-            
+            delete_List.append(list(jikanwari.keys())[idx])
+
+        for target in delete_List:
+            del jikanwari[target]
+        
         file.Save(jikanwari)
+        jikanwari = file.Load()    
+        print(jikanwari)
+        
         Update_Main_Window()
 
         
@@ -243,14 +248,24 @@ def Update_Main_Window():
     global main_Frame 
     label_Count = 0
     checkbox_Vars.clear() 
+    
+    widgets = main_Frame.winfo_children()[1:]
+    
+    for name in widgets:
+        name.destroy()
 
-    for widget in main_Frame.winfo_children():
-        if widget.winfo_class() != 'Frame':
-            widget.destroy() 
+    if not jikanwari:
+        row_Frame = tk.Frame(main_Frame, bg="gray28", borderwidth=2, relief="raised", padx=20, pady=30)
+        row_Frame.grid(row=label_Count + 1, column=0, sticky="ew", padx=5, pady=3, columnspan=7)
+        
+        Label = tk.Label(row_Frame, text="課題が登録されていません。\n登録ボタンから課題の登録を行ってください", font=("Arial", 13, "bold"), foreground="gray92", background="gray28")
+        Label.grid(row=0, column=0, padx=10)
+        return
 
     max_subject_width = max(len(kamoku) for kamoku in jikanwari) + 4 
-
+    
     for kamoku in jikanwari:
+        print(kamoku)
         kadaihaihubi = file.Kadai_Haihu_Day(weekdays[jikanwari[kamoku]["曜日"]])
         simekiribi = file.Deadline_Day(kadaihaihubi, jikanwari[kamoku]["期限"])
 
@@ -318,7 +333,7 @@ def Update_Main_Window():
         raise_Button.grid(row=0, column=7, padx=10)
 
         label_Count += 1
-        
+
         
 def Scroll_Canvas(event):
     """スクロールする"""
@@ -327,13 +342,13 @@ def Scroll_Canvas(event):
     else: 
         canvas.yview_scroll(1, "units")
     
-    
 def Check_All_Checkbox_Values():
     """チェックボックスの取得"""
     check_list = []
     for idx, var in enumerate(checkbox_Vars):
         if var.get() == 1:
             check_list.append(idx)
+    print(check_list)
     return check_list
 
 """メインウィンドウの表示"""
