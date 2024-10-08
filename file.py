@@ -106,20 +106,21 @@ def Update_Raise(target):
         kadaihaihubi = Kadai_Haihu_Day(weekdays[target[i]["曜日"]])
         simekiribi = Deadline_Day(kadaihaihubi, target[i]["期限"])
         today = datetime.now().date()
+
+        if datetime.strptime(kadaihaihubi, '%Y-%m-%d').date() <= today:
+            if target[i]["提出"] == 2:  #未配布の場合未提出にする
+                target[i]["提出"] = 0
+
         
         if datetime.strptime(simekiribi, '%Y-%m-%d').date() < today:
             """締め切りを過ぎている場合"""
             kadaihaihubi = Next_Kadai_Haihu_Day(weekdays[jikanwari[i]["曜日"]])
             simekiribi = Deadline_Day(kadaihaihubi, jikanwari[i]["期限"])
             
-            if target[i]["提出"] == 0:  #未提出の場合
-                target[i]["提出忘れ"] += 1  
-            
-            if datetime.strptime(kadaihaihubi, '%Y-%m-%d').date() <= datetime.now().date():
-                """次の課題配布日を迎えている場合"""
-                if target[i]["提出"] == 2:  #未配布の場合未提出にする
-                    target[i]["提出"] = 0
-                    
+            if datetime.strptime(kadaihaihubi, '%Y-%m-%d').date() <= today:
+                if target[i]["提出"] == 0:  #未提出の場合
+                    target[i]["提出忘れ"] += 1  
+                                
             else:
                 """次の課題配布日を迎えてない場合"""
                 target[i]["提出"] = 2  #未配布にする
