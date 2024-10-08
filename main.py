@@ -317,7 +317,7 @@ def Update_Main_Window():
         deadline_Label = tk.Label(row_Frame, text=simekiribi, font=("Arial", 14), foreground="gray92", background=frame_Color)
         deadline_Label.grid(row=0, column=4, padx=5)
 
-        edit_Button = tk.Button(row_Frame, text="詳細", command=partial(Open_Confirmation_Window, kamoku), bg="gray75")
+        edit_Button = tk.Button(row_Frame, text="詳細", command=partial(Open_Confirmation_Window, kamoku), bg=frame_Color)
         edit_Button.grid(row=0, column=5, padx=5)
         
         teisyutu_Label = tk.Label(row_Frame, text=teisyutu_Joukyou, font=("Arial", 17, "bold"), foreground=color, background=frame_Color)
@@ -336,6 +336,12 @@ def Scroll_Canvas(event):
         canvas.yview_scroll(-1, "units")
     else: 
         canvas.yview_scroll(1, "units")
+
+def On_Mousewheel(event):
+    if event.num == 4:
+        canvas.yview_scroll(-1, "units") 
+    elif event.num == 5:
+        canvas.yview_scroll(1, "units") 
     
 def Check_All_Checkbox_Values():
     """チェックボックスの取得"""
@@ -356,8 +362,12 @@ canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 canvas.configure(yscrollcommand=scrollbar.set)
 
+
 if platform.system() == 'Darwin': 
-    canvas.bind_all("<Scroll>", Scroll_Canvas)
+    """MAC_OS"""
+    canvas.bind("<Button-4>", On_Mousewheel)
+    canvas.bind("<Button-5>", On_Mousewheel)
+
 else: 
     canvas.bind_all("<MouseWheel>", Scroll_Canvas)
 
@@ -395,7 +405,7 @@ delete_Button.grid(row=1, column=0, padx=10, pady=5)
 """画面の更新"""
 Update_Main_Window()
 
-"""スクロール処理"""
+"""再起動処理"""
 root.bind("<KeyPress>", On_Key_Event)
 
 root.mainloop()
