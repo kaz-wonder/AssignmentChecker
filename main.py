@@ -284,7 +284,9 @@ def Update_Main_Window():
             button_Command = partial(Cancel, kamoku)
             
         elif jikanwari[kamoku]["提出"] == 2:
-            teisyutu_Joukyou = "未配布"
+            Next = datetime.strptime(kadaihaihubi, '%Y-%m-%d').date() - datetime.now().date()
+            print(Next)
+            teisyutu_Joukyou = "未配布\nあと{}日".format(Next.days)
             color = "navajowhite"
             button_Text = "提出"
             button_Color = "gray"
@@ -373,7 +375,7 @@ else:
 
 """ヘッダーの表示"""
 header_Frame = tk.Frame(main_Frame, bg="gray28")
-header_Frame.grid(row=0, column=0, sticky="w", columnspan=7) 
+header_Frame.grid(row=0, column=0, sticky="ew", columnspan=7) 
 
 label0 = tk.Label(header_Frame, text="選択", font=("Arial", 14), relief="solid", padx=3)
 label0.grid(row=0, column=0, padx=7, pady=5)
