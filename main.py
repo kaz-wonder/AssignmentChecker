@@ -54,13 +54,13 @@ def Open_Confirmation_Window(kamoku):
     comment = comment.format(kamoku, jikanwari[kamoku]["曜日"], teisyutujoukyou, jikanwari[kamoku]["期限"], jikanwari[kamoku]["提出忘れ"])
 
     subject_Label = tk.Label(confirmation_Window, text=comment, font=("Arial", 13, "bold"), foreground="gray92", background="gray28")
-    subject_Label.grid(row=0, column=0, columnspan=3, sticky="ew")
+    subject_Label.grid(row=0, column=0, columnspan=3, sticky="nsew")
     
     def Close_Window():
-        confirmation_Window.destroy()  # ウィンドウを閉じる
+        confirmation_Window.destroy()
 
     update_Button = tk.Button(confirmation_Window, text="閉じる", fg="gray92", bg="gray28", command=Close_Window)
-    update_Button.grid(row=1, column=0, columnspan=3, sticky="ew")
+    update_Button.grid(row=1, column=0, columnspan=3, sticky="nsew")
     
     confirmation_Window.grid_columnconfigure(0, weight=1)
     confirmation_Window.grid_columnconfigure(1, weight=1)
@@ -68,13 +68,11 @@ def Open_Confirmation_Window(kamoku):
 
 def Raice(kamoku):
     """提出処理"""
-    # チェックされた項目の処理
     checked_Items = Check_All_Checkbox_Values()
     for idx in checked_Items:
         subject_Name = list(jikanwari.keys())[idx]
         Process_Subject_Submission(subject_Name)
 
-    # 現在の課題の提出状況を処理
     Process_Subject_Submission(kamoku)
 
 def Process_Subject_Submission(kamoku):
@@ -284,14 +282,16 @@ def Update_Main_Window():
             button_Command = partial(Cancel, kamoku)
             
         elif jikanwari[kamoku]["提出"] == 2:
-            teisyutu_Joukyou = "未配布"
+            Next = datetime.strptime(kadaihaihubi, '%Y-%m-%d').date() - datetime.now().date()
+            teisyutu_Joukyou = "未配布\nあと{}日".format(Next.days)
             color = "navajowhite"
             button_Text = "提出"
             button_Color = "gray"
             button_Command = partial(Raice, kamoku)
             
         else:
-            teisyutu_Joukyou = "未提出"
+            Next = datetime.strptime(simekiribi, '%Y-%m-%d').date() - datetime.now().date()
+            teisyutu_Joukyou = "未提出\nあと{}日".format(Next.days)
             color = "orange"
             button_Text = "提出"
             button_Color = "gray92"
@@ -317,7 +317,7 @@ def Update_Main_Window():
         deadline_Label = tk.Label(row_Frame, text=simekiribi, font=("Arial", 14), foreground="gray92", background=frame_Color)
         deadline_Label.grid(row=0, column=4, padx=5)
 
-        edit_Button = tk.Button(row_Frame, text="詳細", command=partial(Open_Confirmation_Window, kamoku), bg="gray75")
+        edit_Button = tk.Button(row_Frame, text="詳細", command=partial(Open_Confirmation_Window, kamoku), bg=frame_Color)
         edit_Button.grid(row=0, column=5, padx=5)
         
         teisyutu_Label = tk.Label(row_Frame, text=teisyutu_Joukyou, font=("Arial", 17, "bold"), foreground=color, background=frame_Color)
@@ -336,6 +336,12 @@ def Scroll_Canvas(event):
         canvas.yview_scroll(-1, "units")
     else: 
         canvas.yview_scroll(1, "units")
+
+def On_Mousewheel(event):
+    if event.num == 4:
+        canvas.yview_scroll(-1, "units") 
+    elif event.num == 5:
+        canvas.yview_scroll(1, "units") 
     
 def Check_All_Checkbox_Values():
     """チェックボックスの取得"""
@@ -352,18 +358,25 @@ main_Frame = tk.Frame(canvas, bg="gray20")
 main_Frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
 canvas.create_window((0, 0), window=main_Frame, anchor="nw")
-canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+canvas.pack(side="left", fill="both", expand=True)
 scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 canvas.configure(yscrollcommand=scrollbar.set)
 
+root.grid_rowconfigure(0, weight=1)
+root.grid_columnconfigure(0, weight=1)
+
+
 if platform.system() == 'Darwin': 
-    canvas.bind_all("<Scroll>", Scroll_Canvas)
+    """MAC_OS"""
+    canvas.bind("<Button-4>", On_Mousewheel)
+    canvas.bind("<Button-5>", On_Mousewheel)
+
 else: 
     canvas.bind_all("<MouseWheel>", Scroll_Canvas)
 
 """ヘッダーの表示"""
 header_Frame = tk.Frame(main_Frame, bg="gray28")
-header_Frame.grid(row=0, column=0, sticky="w", columnspan=7) 
+header_Frame.grid(row=0, column=0, sticky="ew", columnspan=7) 
 
 label0 = tk.Label(header_Frame, text="選択", font=("Arial", 14), relief="solid", padx=3)
 label0.grid(row=0, column=0, padx=7, pady=5)
@@ -390,12 +403,12 @@ add_Button = tk.Button(edit_Frame, text="科目の追加", font=("Arial", 11, "b
 add_Button.grid(row=0, column=0, padx=10, pady=5) 
 
 delete_Button = tk.Button(edit_Frame, text="科目の削除", font=("Arial", 11, "bold"), relief="solid", padx=15, command=Delete_Subject)
-delete_Button.grid(row=1, column=0, padx=10, pady=5) 
+delete_Button.grid(row=1, column=0, padx=10, pady=5 ) 
 
 """画面の更新"""
 Update_Main_Window()
 
-"""スクロール処理"""
+"""再起動処理"""
 root.bind("<KeyPress>", On_Key_Event)
 
 root.mainloop()
