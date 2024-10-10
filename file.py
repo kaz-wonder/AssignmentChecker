@@ -117,8 +117,7 @@ def Update_Raise(target):
             if target[i]["提出"] == 0:  #未提出の場合
                 target[i]["提出忘れ"] += 1  
             
-            
-            else:
+            if datetime.strptime(kadaihaihubi, '%Y-%m-%d').date() > datetime.now().date():
                 """次の課題配布日を迎えてない場合"""
                 target[i]["提出"] = 2  #未配布にする
         
