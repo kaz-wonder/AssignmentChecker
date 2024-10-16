@@ -42,8 +42,6 @@ def Saves(kamoku, youbi, kigen, wasure):
 
     return jikanwari
 
-
-
 def Sort_Jikanwari(target):
     today = datetime.now()
 
@@ -107,7 +105,6 @@ def Update_Raise(target):
         kadaihaihubi = Kadai_Haihu_Day(weekdays[target[i]["曜日"]])
         simekiribi = Deadline_Day(kadaihaihubi, target[i]["期限"])
         today = datetime.now().date()
-        print(i, simekiribi)
         
         if datetime.strptime(simekiribi, '%Y-%m-%d').date() < today:
             """締め切りを過ぎている場合"""

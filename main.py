@@ -317,13 +317,13 @@ def Update_Main_Window():
         deadline_Label = tk.Label(row_Frame, text=simekiribi, font=("Arial", 14), foreground="gray92", background=frame_Color)
         deadline_Label.grid(row=0, column=4, padx=5)
 
-        edit_Button = tk.Button(row_Frame, text="詳細", command=partial(Open_Confirmation_Window, kamoku), bg=frame_Color)
+        edit_Button = tk.Button(row_Frame, text="詳細", command=partial(Open_Confirmation_Window, kamoku), background=frame_Color)
         edit_Button.grid(row=0, column=5, padx=5)
         
         teisyutu_Label = tk.Label(row_Frame, text=teisyutu_Joukyou, font=("Arial", 17, "bold"), foreground=color, background=frame_Color)
         teisyutu_Label.grid(row=0, column=6, padx=25)
         
-        raise_Button = tk.Button(row_Frame, text=button_Text, font=("Arial", 15, "bold"), command=button_Command, width=7, bg=button_Color)
+        raise_Button = tk.Button(row_Frame, text=button_Text, font=("Arial", 15, "bold"), command=button_Command, width=7, background=button_Color)
         raise_Button.grid(row=0, column=7, padx=10)
 
         label_Count += 1
